@@ -2,73 +2,63 @@ import random
 import time
 
 from game import Game
-from player import Player
+from player import Player, BotPlayer
+from cards import *
 
 
 # Set conditions
 # Condition 1: Same color
 # Condition 2: Same number
 
-def draw(lst):
-    colors = ["red", "yellow", "blue", "green"]
-    card = {random.randint(0, 9): random.choice(colors)}
-    lst.append(card)
-    return lst
 
-def check_same_number(lst, g, card):
-    if list(card.keys())[0] == list(g.current_card.keys())[0]:
-        return card
+def main(p_no, bot_no):
+    # Generate a game
+    g = Game()
+    # print(len(Game.pack))
 
-    else:
-        print("Wrong number")
-        draw(lst)
-
-def check_color(lst, g, card):
-    # print(card, g.current_card)
-    if list(card.values())[0] == list(g.current_card.values())[0]:
-        return card
-
-    else:
-        print("Wrong color")
-        if check_same_number(lst, g, card):
-            return check_same_number(lst, g, card)
-
-def main(p_no):
-    winner = False
     # Generate decks for each player
+    global play
     players = []
     for i in range(p_no):
         players.append(Player())
 
-    # Generate a game (center card)
-    g = Game()
+    for i in range(bot_no):
+        players.append(BotPlayer())
+
 
     # Play
     turns = len(players)
     turn = 0
-    while not winner:
+    while True:
         print(g.current_card)
         time.sleep(1)  # pause
         print(f"Player {turn+1}\'s turn.")
-        print(players[turn].deck)
+        print([i.value_as_dict for i in players[turn].deck])
         time.sleep(1)  # pause
-        play = int(input(f"Enter a number from 0-{len(players[turn].deck)-1} \n"))
+
+        if isinstance(players[turn], BotPlayer):
+            play = players[turn].play_turn()
+
+        else:
+            play = int(input(f"Enter a number from 0-{len(players[turn].deck)-1} \n"))
+
         time.sleep(1)  # pause
-        if not check_color(players[turn].deck, g, players[turn].deck[play]):
+        if not players[turn].deck[play].check_color(players[turn].deck, g, players[turn].deck[play]):
             turn += 1
             if turn >= turns:
                 turn = 0
             continue
 
-        g.current_card = players[turn].deck[play]
+        g.current_card = players[turn].deck[play].value_as_dict
         time.sleep(1)  # pause
+        players[turn].deck.remove(players[turn].deck[play])
+
         if len(players[turn].deck) == 1:
             print(f"Player {turn+1} says UNO!")
 
         elif len(players[turn].deck) == 0:
             break
 
-        players[turn].deck.remove(players[turn].deck[play])
         turn += 1
         if turn >= turns:
             turn = 0
@@ -79,5 +69,6 @@ def main(p_no):
 
 
 if __name__ == "__main__":
-    player_count = 4
-    main(player_count)
+    player_count = 2
+    bot_count = 0
+    main(player_count, bot_count)
