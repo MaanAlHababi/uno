@@ -25,4 +25,28 @@ class BotPlayer(Player):
         super().__init__()
 
     def play_turn(self):
+        pass
+
+class NoobBotPlayer(BotPlayer):
+    def __init__(self, game):
+        super().__init__()
+        self.game = game
+
+    def play_turn(self):
         return random.randint(0, len(self.deck)-1)
+
+class ProBotPlayer(BotPlayer):
+    def __init__(self, game):
+        super().__init__()
+        self.game = game
+
+    def smort_play(self):
+        for card in self.deck:
+            if card.check_color(self.game, card, self.deck):
+                return self.deck.index(card)
+
+        rnd = random.randint(0, len(self.deck)-1)
+        return rnd
+
+    def play_turn(self):
+        return self.smort_play()

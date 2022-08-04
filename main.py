@@ -2,7 +2,7 @@ import random
 import time
 
 from game import Game
-from player import Player, BotPlayer
+from player import Player, BotPlayer, NoobBotPlayer, ProBotPlayer
 from cards import *
 
 
@@ -11,7 +11,7 @@ from cards import *
 # Condition 2: Same number
 
 
-def main(p_no, bot_no):
+def main(p_no, noob_bot_no, pro_bot_no):
     # Generate a game
     g = Game()
     # print(len(Game.pack))
@@ -22,14 +22,20 @@ def main(p_no, bot_no):
     for i in range(p_no):
         players.append(Player())
 
-    for i in range(bot_no):
-        players.append(BotPlayer())
+    for i in range(noob_bot_no):
+        players.append(NoobBotPlayer(g))
+
+    for i in range(pro_bot_no):
+        players.append(ProBotPlayer(g))
 
 
     # Play
     turns = len(players)
     turn = 0
     while True:
+        if len(Game.pack) <= 0:
+            g.prepare_pack()
+
         print(g.current_card)
         time.sleep(1)  # pause
         print(f"Player {turn+1}\'s turn.")
@@ -43,7 +49,8 @@ def main(p_no, bot_no):
             play = int(input(f"Enter a number from 0-{len(players[turn].deck)-1} \n"))
 
         time.sleep(1)  # pause
-        if not players[turn].deck[play].check_color(players[turn].deck, g, players[turn].deck[play]):
+        if not players[turn].deck[play].check_color(g, players[turn].deck[play], players[turn].deck):
+            Cards.draw(players[turn].deck)
             turn += 1
             if turn >= turns:
                 turn = 0
@@ -69,6 +76,7 @@ def main(p_no, bot_no):
 
 
 if __name__ == "__main__":
-    player_count = 2
-    bot_count = 0
-    main(player_count, bot_count)
+    player_count = 1
+    noob_bot_count = 0
+    pro_bot_count = 1
+    main(player_count, noob_bot_count, pro_bot_count)
